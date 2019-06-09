@@ -1,6 +1,7 @@
 package sample;
 
 
+import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -8,6 +9,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 import javafx.stage.Stage;
@@ -20,8 +22,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class Main extends Application  {
-    ArrayList arrayList = new ArrayList();
-
+    boolean shoot;
     boolean goRIGHT,goLEFT;
     int shootCall=500;
 
@@ -35,21 +36,30 @@ public class Main extends Application  {
     Timer timer = new Timer();
 
 
+
     @Override
     public void start(Stage primaryStage) throws Exception{
         Group root = new Group();
         final double StartX = 220;
 
-
-        TimerTask task = new TimerTask() {
+        AnimationTimer timer = new AnimationTimer() {
             @Override
-            public void run() {
-                shootCall-=7;
-                shot.Draw(StartX,shootCall);
+            public void handle(long now) {
+                if(goLEFT == true){
+                    p.moveLeft();
+
+                }
+                if(goRIGHT == true){
+                    p.moveRight();
+                }
+                else if (shoot == true){
+                        shootCall-=7;
+                        shot.Draw(StartX,shootCall);
+                }
 
             }
         };
-
+        timer.start();
 
         root.getChildren().add(p.draw());
 
@@ -64,16 +74,24 @@ public class Main extends Application  {
            @Override
             public void handle(KeyEvent event) {
                switch (event.getCode()){
-                   case LEFT:p.moveLeft(); break;//goLEFT=true;break;
-                    case RIGHT: p.moveRight();break;//goRIGHT=true;break;
+                   case LEFT:goLEFT=true; break;//goLEFT=true;break;
+                    case RIGHT:goRIGHT=true;break;//goRIGHT=true;break;
                    case SPACE: shootCall = 650;
-
-                       timer.schedule(task,10,35);
+                       shoot =true;
                        root.getChildren().add(shot.Draw(p.getX(),shootCall));
                        break;
 
                 }
 
+            }
+        });
+        scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                switch (event.getCode()){
+                    case LEFT: goLEFT = false;
+                    case RIGHT: goRIGHT = false;
+                }
             }
         });
 
